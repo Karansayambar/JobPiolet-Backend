@@ -6,7 +6,7 @@ const mailService = require("../services/mailler");
 const jwt = require("jsonwebtoken");
 const resetPassword = require("../utils/resetPasswordTemplate");
 const crypto = require("crypto");
-const secreatKey = "sdnbsmndbcsnm";
+const secreatKey = process.env.JWT_SECRET;
 
 const signToken = (userId) => jwt.sign({ userId }, secreatKey);
 
@@ -140,6 +140,7 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
       status: "error",
       message: "OTP is incorrect",
     });
+    const { stripeWebhook } = require("./controllers/paymentController");
   }
 
   // Mark email as verified and remove OTP
