@@ -1,4 +1,5 @@
 const Subscription = require("../models/company/subscriptionSchema");
+require("dotenv").config();
 
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_KEY);

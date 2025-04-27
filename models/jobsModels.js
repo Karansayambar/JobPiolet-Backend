@@ -73,9 +73,10 @@ const jobSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
     applicants: [
       {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "Auth" },
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "Candidate" },
         appliedAt: { type: Date, default: Date.now },
         status: {
           type: String,
