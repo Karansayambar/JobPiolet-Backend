@@ -84,6 +84,7 @@ const getAllJobs = async (req, res) => {
 const applyToJob = async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
+  const score = req.body;
 
   console.log("jobId", id);
   console.log("userId", userId);
@@ -119,6 +120,7 @@ const applyToJob = async (req, res) => {
       jobId, // Schema expects `jobId`, not just `id`
       status: "pending", // Optional, if schema requires
       isApplied: true,
+      score: score,
     });
     await candidate.save();
 
@@ -133,8 +135,6 @@ const getAppliedStatus = async (req, res) => {
   const { jobId } = req.params;
   const { userId } = req.user;
 
-  // console.log("req.body", jobId);
-
   try {
     // 1. Check if candidate exists
     const candidate = await candidateProfile.findOne({ userId }).lean();
@@ -146,14 +146,15 @@ const getAppliedStatus = async (req, res) => {
       });
     }
 
-    // console.log(" candidate", candidate);
+    console.log(" candidate", candidate);
+    console.log("jobId", jobId);
     // Using find() to get the first matching job
     const appliedJob = candidate.appliedJobs.find((job) => {
-      // console.log("Checking job:", job.jobId.toString() === jobId);
+      console.log("Checking job:", job.jobId.toString() === jobId);
       return job.jobId.toString() === jobId; // Note the 'return' statement
     });
 
-    // console.log("applied jobs", appliedJob);
+    console.log("applied jobs", appliedJob);
 
     // 3. Return application status
     res.status(200).json({

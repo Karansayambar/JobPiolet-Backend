@@ -14,11 +14,24 @@ const {
   checkIfJobIsFavorited,
   getApplicants,
 } = require("../controllers/JobsControllers");
+const limiter = require("../utils/rateLimiter");
+// const rateLimit = require("express-rate-limit");
+
+// const limiter = rateLimit({
+//   windowMs: 1 * 60 * 1000,
+//   max: 5,
+//   handler: (req, res) => {
+//     res.status(429).json({
+//       status: "fail",
+//       message: "To Many Requests",
+//     });
+//   },
+// });
 
 // Route to create a new job
 jobRoute.post("/create-job", protect, createJob);
 jobRoute.get("/get-my-jobs", protect, getMYJobs); // Route to get user's jobs
-jobRoute.get("/getAllJobs", protect, getAllJobs);
+jobRoute.get("/getAllJobs", limiter, protect, getAllJobs);
 jobRoute.post("/apply-to-job/:id", protect, applyToJob); // Route to get all jobs
 jobRoute.get("/getAppliedJobs", protect, getAppliedJobs);
 jobRoute.get("/getJobDetails/:jobId", getJobDetails);

@@ -140,7 +140,6 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
       status: "error",
       message: "OTP is incorrect",
     });
-    const { stripeWebhook } = require("./controllers/paymentController");
   }
 
   // Mark email as verified and remove OTP
