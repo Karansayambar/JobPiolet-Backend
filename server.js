@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: "https://jobpiolet-backend-1.onrender.com",
+    origin: "https://job-piolet-frontend.vercel.app/",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
   })
