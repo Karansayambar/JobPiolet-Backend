@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: "https://taskmanager-stamurai-client.onrender.com",
+    origin: "https://jobpiolet-backend-1.onrender.com",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
   })
