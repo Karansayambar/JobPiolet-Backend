@@ -1,4 +1,4 @@
-const Auth = require("../models/authModels");
+// const Auth = require("../models/authModels");
 const Jobs = require("../models/company/createJobModel");
 const favoriteJobs = require("../models/favoriteJobs");
 const candidateProfile = require("../models/userModels");
@@ -204,7 +204,7 @@ const getAppliedJobs = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Applied jobs fetched successfully",
-      data: appliedJobs,
+      appliedJobs,
       count: appliedJobs.length,
     });
   } catch (error) {
