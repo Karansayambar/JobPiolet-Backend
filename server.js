@@ -26,8 +26,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    // origin: "http://localhost:5173",
-    origin: "https://job-piolet-frontend.vercel.app",
+    origin: "http://localhost:5173",
+    // origin: "https://job-piolet-frontend.vercel.app",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
   },
@@ -46,8 +46,8 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: "https://job-piolet-frontend.vercel.app",
-    // origin: "http://localhost:5173",
+    // origin: "https://job-piolet-frontend.vercel.app",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
   })
