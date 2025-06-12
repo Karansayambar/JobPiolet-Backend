@@ -37,7 +37,7 @@ const createJob = async (req, res) => {
 
     // Create new job
     const createdJob = await Jobs.create(jobData);
-
+    global.io.emit("newJobPosted", createdJob);
     console.log("createdJob", createdJob);
 
     return res.status(201).json({
@@ -66,11 +66,21 @@ const getMYJobs = async (req, res) => {
 };
 
 const getAllJobs = async (req, res) => {
+  const { userId } = req.user;
+  console.log("user id of candidate", userId)
+ 
   try {
+
+    // const userJobProfile = await candidateProfile.findById(userId)
+    // console.log("userProfile", userJobProfile);
+    const role = "frontend developer"
+
+
     const jobs = await Jobs.find();
     if (!jobs) {
       return res.status(404).json({ message: "No jobs found" });
     }
+    global.io.emit("getAllJobs", jobs)
 
     return res
       .status(200)

@@ -6,9 +6,11 @@ const mailService = require("../services/mailler");
 const jwt = require("jsonwebtoken");
 const resetPassword = require("../utils/resetPasswordTemplate");
 const crypto = require("crypto");
-const secreatKey = process.env.JWT_SECRET;
+const candidateProfile = require("../models/userModels");
+const dotenv = require("dotenv").config();
+const secretKey = process.env.JWT_SECRET;
 
-const signToken = (userId) => jwt.sign({ userId }, secreatKey);
+const signToken = (userId) => jwt.sign({ userId }, secretKey);
 
 const otpTemplate = (name, otp) => {
   return `
@@ -174,11 +176,16 @@ exports.login = catchAsync(async (req, res, next) => {
     });
     return;
   }
+let candidateProfileRole;
+const profile = await candidateProfile.findOne({ userId: user._id });
+if(profile){
+  candidateProfileRole =profile.candidateInfo.title
+}
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     res.status(400).json({
       status: "error",
-      message: "Email or Password is Invallid",
+      message: "Email or Password is Invalid",
     });
     return;
   }
@@ -191,6 +198,7 @@ exports.login = catchAsync(async (req, res, next) => {
     token,
     user_id: user._id,
     role: user.role,
+    title :candidateProfileRole
   };
 
   if (user.role === "company") {

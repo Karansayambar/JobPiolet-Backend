@@ -31,7 +31,7 @@ const limiter = require("../utils/rateLimiter");
 // Route to create a new job
 jobRoute.post("/create-job", protect, createJob);
 jobRoute.get("/get-my-jobs", protect, getMYJobs); // Route to get user's jobs
-jobRoute.get("/getAllJobs", limiter, protect, getAllJobs);
+jobRoute.get("/getAllJobs", protect, getAllJobs);
 jobRoute.post("/apply-to-job/:id", protect, applyToJob); // Route to get all jobs
 jobRoute.get("/getAppliedJobs", protect, getAppliedJobs);
 jobRoute.get("/getJobDetails/:jobId", getJobDetails);
