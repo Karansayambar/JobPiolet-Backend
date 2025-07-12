@@ -1,5 +1,7 @@
 const Auth = require("../models/authModels");
 const companyProfile = require("../models/company/companyProfileModel");
+const savedCandidate = require("../models/company/savedCandidateModel");
+const candidateProfile = require("../models/userModels");
 
 const createProfile = async (req, res, next) => {
   try {
@@ -73,4 +75,142 @@ const getProfile = async (req, res) => {
   }
 };
 
-module.exports = { createProfile, getProfile };
+const saveCandidate = async (req, res) => {
+  const { candidateId, jobId } = req.body;
+
+  const companyId = req.user.userId;
+
+  try {
+    console.log("candidateId and JobId", candidateId, jobId);
+
+    // Check if already saved
+
+    const existingSave = await savedCandidate.findOne({
+      candidateId,
+
+      jobId,
+    });
+
+    if (existingSave) {
+      return res
+
+        .status(400)
+
+        .json({ message: "Candidate already saved for this job." });
+    }
+
+    const candidateInfo = await candidateProfile.findOne({
+      userId: candidateId,
+    });
+
+    if (!candidateInfo) {
+      return res.status(404).json({ message: "Candidate not found." });
+    }
+
+    candidateInfo.isSaved = true;
+
+    await candidateInfo.save();
+
+    const saved = await savedCandidate.create({
+      candidateId,
+
+      jobId,
+
+      companyId,
+    });
+
+    return res.status(201).json({
+      message: "Candidate saved successfully.",
+
+      data: saved,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Server error." });
+  }
+};
+
+const unsaveCandidate = async (req, res) => {
+  const { candidateId, jobId } = req.body;
+
+  try {
+    const candidateInfo = await candidateProfile.findOne({
+      userId: candidateId,
+    });
+
+    if (!candidateInfo) {
+      return res.status(404).json({ message: "Candidate not found." });
+    }
+
+    candidateInfo.isSaved = false;
+
+    await candidateInfo.save();
+
+    const deleted = await savedCandidate.findOneAndDelete({
+      candidateId,
+
+      jobId,
+    });
+
+    if (!deleted) {
+      return res
+
+        .status(404)
+
+        .json({ message: "No saved candidate found for this job." });
+    }
+
+    return res.status(200).json({ message: "Candidate unsaved successfully." });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Server error." });
+  }
+};
+
+const getSavedCandidates = async (req, res) => {
+  const companyId = req.user.userId;
+
+  try {
+    const savedCandidates = await savedCandidate.find({ companyId });
+
+    if (!savedCandidates) {
+      return res.status(404).json({
+        message: "No Candidates Saved Ate",
+      });
+    }
+
+    const savedCandidateDetails = await Promise.all(
+      savedCandidates.map((cd) => {
+        return candidateProfile.findOne({
+          userId: cd.candidateId,
+        });
+      })
+    );
+
+    if (!savedCandidateDetails) {
+      return res.status(404).json({
+        message: "No Candidates Saved Ate",
+      });
+    }
+
+    res.status(200).json({
+      message: "saved candidates details",
+
+      savedCandidateDetails,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({ message: "Server error." });
+  }
+};
+
+module.exports = {
+  createProfile,
+  getProfile,
+  saveCandidate,
+  unsaveCandidate,
+  getSavedCandidates,
+};

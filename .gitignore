@@ -1,6 +1,7 @@
 # .env
 .env
 node_modules/
+.env.backup
 
 # Build outputs
 dist/
