@@ -94,7 +94,6 @@ exports.sendOTP = catchAsync(async (req, res, next) => {
   user.otp = new_otp.toString();
 
   await user.save({ new: true, validateModifiedOnly: true });
-
   // TODO send mail
   mailService.sendEmail({
     from: "karansayambar@gmail.com",
@@ -176,11 +175,11 @@ exports.login = catchAsync(async (req, res, next) => {
     });
     return;
   }
-let candidateProfileRole;
-const profile = await candidateProfile.findOne({ userId: user._id });
-if(profile){
-  candidateProfileRole =profile.candidateInfo.title
-}
+  let candidateProfileRole;
+  const profile = await candidateProfile.findOne({ userId: user._id });
+  if (profile) {
+    candidateProfileRole = profile.candidateInfo.title;
+  }
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     res.status(400).json({
@@ -198,7 +197,7 @@ if(profile){
     token,
     user_id: user._id,
     role: user.role,
-    title :candidateProfileRole
+    title: candidateProfileRole,
   };
 
   if (user.role === "company") {

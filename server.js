@@ -15,6 +15,7 @@ const Jobs = require("./models/company/createJobModel");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const candidateProfile = require("./models/userModels");
+const favoriteJobs = require("./models/favoriteJobs");
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 const dotenv = require("dotenv").config();
 // const http = require("http")
@@ -26,8 +27,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
-    // origin: "https://job-piolet-frontend.vercel.app",
+    // origin: "http://localhost:5173",
+    origin: "https://job-piolet-frontend.vercel.app",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
   },
@@ -46,8 +47,8 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    // origin: "https://job-piolet-frontend.vercel.app",
-    origin: "http://localhost:5173",
+    origin: "https://job-piolet-frontend.vercel.app",
+    // origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     credentials: true,
   })
@@ -59,7 +60,7 @@ app.use("/api/jobs", jobRoute);
 app.use("/api/payment", paymentRoute);
 app.use("/api/candidate", candidateRoute);
 server.listen(5000, () => {
-  console.log(`server working on http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
   connectDB();
 });
 
@@ -119,6 +120,61 @@ io.on("connection", (socket) => {
         message: "Server Error",
       });
     }
+  });
+
+  socket.on("getAppliedJobs", async () => {
+    const userId = socket.user.userId;
+    try {
+      const candidate = await candidateProfile.findOne({ userId: userId });
+      if (!candidate) {
+        socket.emit("getAppliedJobs", {
+          success: false,
+          message: "No candidate profile found",
+        });
+      }
+
+      const jobIdArray = candidate.appliedJobs;
+      const appliedJobs = await Promise.all(
+        jobIdArray.map((jd) => {
+          return Jobs.findOne({
+            _id: jd.jobId,
+          });
+        })
+      );
+      if (appliedJobs) {
+        socket.emit("getAppliedJobs", {
+          success: true,
+          message: "applied jobs fetched successfully",
+          appliedJobs,
+        });
+      }
+    } catch (error) {}
+  });
+
+  socket.on("getFavoriteJobs", async () => {
+    try {
+      const userId = socket.user.userId;
+
+      const jobs = await favoriteJobs.find({ candidateId: userId });
+      if (!jobs) {
+        socket.emit("getFavoriteJobs", {
+          success: false,
+          message: "No jobs found",
+        });
+      }
+
+      const favoriteJobsList = await Promise.all(
+        jobs.map((jd) => {
+          return Jobs.findOne({ _id: jd.jobId });
+        })
+      );
+
+      socket.emit("getFavoriteJobs", {
+        success: true,
+        message: "favorite jobs fetched successfully",
+        favoriteJobsList,
+      });
+    } catch (error) {}
   });
 
   socket.on("disconnect", () => {

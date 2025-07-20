@@ -39,4 +39,26 @@ const createProfile = async (req, res, next) => {
   }
 };
 
-module.exports = createProfile;
+const getProfile = async (req, res) => {
+  console.log("profile id of candidate", req.user);
+  const userId = req.user.id;
+  try {
+    const userProfile = await candidateProfile.findOne(userId);
+    if (!userProfile) {
+      return res.status(401).json({
+        message: "user profile not created",
+      });
+    }
+
+    res.status(201).json({
+      message: "user profile fetched successfully",
+      userProfile,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { createProfile, getProfile };
